@@ -1,7 +1,6 @@
 package org.task;
 
 import org.task.exceptions.EquationException;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -13,39 +12,58 @@ public class Parser {
     private static final Pattern NUM = Pattern.compile("(\\d+(\\.\\d+)?)");
     private static final Pattern NON_BRACKETS = Pattern.compile("[^()]+");
 
-    public String toPostfix(String expr) {
+    public String parseExpr(String expr) {
+        List<String> nums = getNumbers(expr);
+        expr = formatExpr(expr);
+        List<Character> res = toPostfix(expr);
+        return substituteNumbers(res, nums);
+    }
+
+    private List<String> getNumbers(String expr) {
         Matcher matcher = NUM.matcher(expr);
         List<String> nums = new ArrayList<>();
-        String modifiedExpr = matcher.replaceAll(num -> {
+        while (matcher.find()) {
             nums.add(matcher.group());
-            return "a";
-        });
-        modifiedExpr = modifiedExpr.replaceAll("\\s+","");
+        }
+        return nums;
+    }
 
+    private String formatExpr(String expr) {
+        return NUM.matcher(expr).replaceAll("a").replaceAll("\\s+", "");
+    }
+
+    private String substituteNumbers(List<Character> expr, List<String> nums) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < expr.size(); i++) {
+            char ch = expr.get(i);
+            if (ch == 'a' && !nums.isEmpty()) {
+                result.append(nums.remove(0));
+            } else {
+                result.append(ch);
+            }
+            if (i < expr.size() - 1) {
+                result.append(" ");
+            }
+        }
+        return result.toString();
+    }
+
+    private List<Character> toPostfix(String expr) {
         boolean prevNum = false;
         boolean unaryMinus = false;
         List<Character> res = new ArrayList<>();
         Deque<Character> stack = new ArrayDeque<>();
-
-        for (char curr : modifiedExpr.toCharArray()) {
-            if (curr == 'a' || curr == 'x') {
-                if (!prevNum) {
-                    res.add(curr);
-                    prevNum = true;
-                    unaryMinus = false;
-                } else {
-                    throw new EquationException("In equation can't be 2 numbers in a row!");
-                }
-            } else if (!prevNum && !unaryMinus && curr == '-') {
-                processOperator('!', stack, res);
+        for (char curr : expr.toCharArray()) {
+            if (isNumber(curr)) {
+                processNumber(curr, prevNum, res);
+                prevNum = true;
+                unaryMinus = false;
+            } else if (isUnaryMinus(curr, prevNum, unaryMinus)) {
+                addOperatorToStack('!', stack, res);
                 unaryMinus = true;
             } else if (isOperation(curr)) {
-                if (prevNum) {
-                    processOperator(curr, stack, res);
-                    prevNum = false;
-                } else {
-                    throw new EquationException("In equation can't be 2 operators in a row!");
-                }
+                processOperator(curr, prevNum, stack, res);
+                prevNum = false;
             } else if (curr == '(') {
                 stack.push(curr);
             } else if (curr == ')') {
@@ -57,38 +75,38 @@ public class Parser {
         while (!stack.isEmpty()) {
             res.add(stack.pop());
         }
-
-        return substituteNumbers(res, nums);
+        return res;
     }
 
-    private String substituteNumbers(List<Character> res, List<String> nums) {
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < res.size(); i++) {
-            char ch = res.get(i);
-            if (ch == 'a' && !nums.isEmpty()) {
-                result.append(nums.remove(0));
-            } else {
-                result.append(ch);
-            }
-            if (i < res.size() - 1) {
-                result.append(" ");
-            }
-        }
-        return result.toString();
+    private boolean isUnaryMinus(char curr, boolean prevNum, boolean unaryMinus) {
+        return !prevNum && !unaryMinus && curr == '-';
     }
 
-    private void processBrackets(Deque<Character> stack, List<Character> res) {
-        while (!stack.isEmpty() && stack.peek() != '(') {
-            res.add(stack.pop());
-        }
-        stack.pop();
+    private boolean isNumber(char curr) {
+        return curr == 'a' || curr == 'x';
     }
 
     private boolean isOperation(char op) {
         return op == '-' || op == '+' || op == '*' || op == '/' ;
     }
 
-    private void processOperator(char curr, Deque<Character> stack, List<Character> res) {
+    private void processNumber(char curr, boolean prevNum, List<Character> res) {
+        if (!prevNum) {
+            res.add(curr);
+        } else {
+            throw new EquationException("In equation can't be 2 numbers in a row!");
+        }
+    }
+
+    private void processOperator(char curr, boolean prevNum, Deque<Character> stack, List<Character> res) {
+        if (prevNum) {
+            addOperatorToStack(curr, stack, res);
+        } else {
+            throw new EquationException("In equation can't be 2 operators in a row!");
+        }
+    }
+
+    private void addOperatorToStack(char curr, Deque<Character> stack, List<Character> res) {
         int priority = getPriority(curr);
         while (!stack.isEmpty() && priority <= getPriority(stack.peek())) {
             res.add(stack.pop());
@@ -105,6 +123,13 @@ public class Parser {
         };
     }
 
+    private void processBrackets(Deque<Character> stack, List<Character> res) {
+        while (!stack.isEmpty() && stack.peek() != '(') {
+            res.add(stack.pop());
+        }
+        stack.pop();
+    }
+
     public boolean validateParentheses(String expr) {
         String parentheses = NON_BRACKETS.matcher(expr).replaceAll("");
         Deque<Character> stack = new ArrayDeque<>();
@@ -115,27 +140,18 @@ public class Parser {
                 return false;
             }
         }
-        System.out.println(parentheses);
         return stack.isEmpty();
     }
 
 
     public static void main(String[] args) {
-        Parser parser = new Parser();
-//        parser.toPostfix("2*x+5=17");
-//        parser.toPostfix("-1.3*5/x=1.2");
-//        parser.toPostfix("2*x*x=10");
-//        parser.toPostfix("2*(x+5+х)+5=10");
-//        parser.toPostfix("17=2*x+5");
-
-        System.out.println(parser.validateParentheses("2*(x+5+х)+5=10"));
-        System.out.println(parser.validateParentheses("(3 * (2 + 5)) - (4 / (1 + 2)) + ((8 - 2) * 4)"));
-
-        System.out.println(parser.toPostfix("(3 * (2 + 5)) - (4 / (1 + 2)) + ((8 - 2) * 4)"));
-        System.out.println(parser.toPostfix("5+(-3+1)"));
-        //-1.3*5/x=1.2
-        System.out.println(parser.toPostfix(" -1.3 * 5 / x "));
-        System.out.println(parser.toPostfix("1.2"));
-        System.out.println(parser.toPostfix("1.2------5"));
+//        Parser parser = new Parser();
+//        System.out.println(parser.validateParentheses("2*(x+5+х)+5=10"));
+//        System.out.println(parser.validateParentheses("(3 * (2 + 5)) - (4 / (1 + 2)) + ((8 - 2) * 4)"));
+//        System.out.println(parser.parseExpr("(3 * (2 + 5)) - (4 / (1 + 2)) + ((8 - 2) * 4)"));
+//        System.out.println(parser.parseExpr("5+(-3+1)"));
+//        System.out.println(parser.parseExpr(" -1.3 * 5 / x "));
+//        System.out.println(parser.parseExpr("1.2"));
+//        System.out.println(parser.parseExpr("1.2--5"));
     }
 }
