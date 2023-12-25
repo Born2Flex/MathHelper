@@ -72,6 +72,9 @@ public class Parser {
                 throw new EquationException("Incorrect equation!");
             }
         }
+        if (!prevNum) {
+            throw new EquationException("Incorrect equation!");
+        }
         while (!stack.isEmpty()) {
             res.add(stack.pop());
         }
@@ -141,17 +144,5 @@ public class Parser {
             }
         }
         return stack.isEmpty();
-    }
-
-
-    public static void main(String[] args) {
-//        Parser parser = new Parser();
-//        System.out.println(parser.validateParentheses("2*(x+5+х)+5=10"));
-//        System.out.println(parser.validateParentheses("(3 * (2 + 5)) - (4 / (1 + 2)) + ((8 - 2) * 4)"));
-//        System.out.println(parser.parseExpr("(3 * (2 + 5)) - (4 / (1 + 2)) + ((8 - 2) * 4)"));
-//        System.out.println(parser.parseExpr("5+(-3+1)"));
-//        System.out.println(parser.parseExpr(" -1.3 * 5 / x "));
-//        System.out.println(parser.parseExpr("1.2"));
-//        System.out.println(parser.parseExpr("1.2--5"));
     }
 }

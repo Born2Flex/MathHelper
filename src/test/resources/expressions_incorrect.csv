@@ -1,0 +1,25 @@
+4 + 2 * 3 6,In equation can't be 2 numbers in a row!
+2*(x+5+x * x) x+5,In equation can't be 2 numbers in a row!
+-x -- x (x) + x,In equation can't be 2 numbers in a row!
+(x)(x)*3,In equation can't be 2 numbers in a row!
+(98/(34-(21+44)/11))-54*12(98/(34-(21+44)/11))-54*12,In equation can't be 2 numbers in a row!
+((23/65)*((98-43)+12)/9)((23/65)*((98-43)+12)/9),In equation can't be 2 numbers in a row!
+((23+65)/((54 + x + 12)32)-89)*((23+65)/((54-12)*32)-89),In equation can't be 2 numbers in a row!
+(54.00((76.00/32.00)*(11.00-45.00)+98.00)),In equation can't be 2 numbers in a row!
+3+*4,In equation can't be 2 operators in a row!
+1.2---5,In equation can't be 2 operators in a row!
+-(+(23/65)*((98-43)+12)/9)((23/65)*((98-43)+12)/9),In equation can't be 2 operators in a row!
+--(54.00((76.00/32.00)*(11.00-45.00)+98.00)),In equation can't be 2 operators in a row!
+((23/65)*((98-43)+12)/-9)(-(23/*65)*((98-43)+12)/9),In equation can't be 2 operators in a row!
+(x)**(x)*3,In equation can't be 2 operators in a row!
+--5--31--21,In equation can't be 2 operators in a row!
+(98//(34-(21+44)/11))-54*12(98/(34-(21+44)/11))-54*12,In equation can't be 2 operators in a row!
+4*-76+-21-,Incorrect equation!
+2*x*xw,Incorrect equation!
+2*(((asd*x+5,Incorrect equation!
+4*-7^2,Incorrect equation!
+-14.234+-12* sin(2),Incorrect equation!
+54.00.121,Incorrect equation!
+45+(32*(87-19.)/54)*-(76.00/32.00),Incorrect equation!
+(45q+(32.*(87^-19)/54)-(12*65)),Incorrect equation!
+(56*(32-19)/54&7)-(12*78),Incorrect equation!
