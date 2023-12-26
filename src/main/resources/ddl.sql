@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS schema;
+
 CREATE TABLE IF NOT EXISTS equations
 (
     id SERIAL PRIMARY KEY,
@@ -9,6 +11,6 @@ CREATE TABLE IF NOT EXISTS equations
 CREATE TABLE IF NOT EXISTS roots
 (
     id SERIAL PRIMARY KEY,
-    equation_id INT REFERENCES equations(id) NOT NULL,
+    equation_id INT REFERENCES equations(id) ON DELETE CASCADE NOT NULL,
     root_value REAL NOT NULL
 );

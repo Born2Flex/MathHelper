@@ -55,14 +55,14 @@ public class MathRepository {
             statement.setString(3, equation);
             statement.executeUpdate();
         } catch (SQLException e) {
-            log.warn("Can't save equation in DB");
+            log.warn("Can't save equation in DB", e);
         }
     }
 
     public void saveRoot(int equationId, double root) {
         try (PreparedStatement statement = connection
                 .prepareStatement("""
-                                    INSERT INTO roots (equation_id, root_value) 
+                                    INSERT INTO roots (equation_id, root_value)
                                     VALUES (?, ?)
                                     """)) {
             statement.setDouble(1, equationId);
@@ -109,6 +109,28 @@ public class MathRepository {
             }
         } catch (SQLException e) {
             log.warn("Can't find equations by root");
+        }
+        return equations;
+    }
+
+    public List<EquationDto> findAllEquations() {
+        List<EquationDto> equations = new ArrayList<>();
+        try (PreparedStatement statement = connection
+                .prepareStatement("""
+                                    SELECT *
+                                    FROM equations e;
+                                    """)) {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                EquationDto equation = new EquationDto();
+                equation.setEquationId(resultSet.getInt(1));
+                equation.setLeftPart(resultSet.getString(2));
+                equation.setRightPart(resultSet.getString(3));
+                equation.setEquation(resultSet.getString(4));
+                equations.add(equation);
+            }
+        } catch (SQLException e) {
+            log.warn("Can't find all equations");
         }
         return equations;
     }

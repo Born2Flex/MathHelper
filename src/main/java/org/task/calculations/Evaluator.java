@@ -1,4 +1,4 @@
-package org.task;
+package org.task.calculations;
 
 import org.task.exceptions.EquationException;
 

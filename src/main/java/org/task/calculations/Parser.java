@@ -1,4 +1,4 @@
-package org.task;
+package org.task.calculations;
 
 import org.task.exceptions.EquationException;
 import java.util.ArrayDeque;
@@ -29,7 +29,8 @@ public class Parser {
     }
 
     private String formatExpr(String expr) {
-        return NUM.matcher(expr).replaceAll("a").replaceAll("\\s+", "");
+        return NUM.matcher(expr).replaceAll("a")
+                .replaceAll("\\s+", "");
     }
 
     private String substituteNumbers(List<Character> expr, List<String> nums) {
