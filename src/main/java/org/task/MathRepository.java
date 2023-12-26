@@ -3,22 +3,22 @@ package org.task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.task.dto.EquationDto;
+import org.task.exceptions.InvalidPropertiesException;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-//TODO ADD EXCEPTION THROWING
+
 public class MathRepository {
     private static final Logger log = LoggerFactory.getLogger(MathRepository.class);
     private final Connection connection;
-
     public MathRepository(String url, String username, String password) {
         try {
             connection = DriverManager.getConnection(url, username, password);
             log.debug("Connection to DB created successfully");
         } catch (SQLException e) {
             log.warn("Can't create connection to DB");
-            throw new RuntimeException("Failed to create connection", e);
+            throw new InvalidPropertiesException("Failed to create connection", e);
         }
     }
 
@@ -39,6 +39,9 @@ public class MathRepository {
                 equationDto.setEquation(resultSet.getString("equation"));
             }
         } catch (SQLException e) {
+            log.warn("Exception occurred while getting equation by id", e);
+        }
+        if (equationDto == null) {
             log.warn("Can't find equation by id");
         }
         return equationDto;

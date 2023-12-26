@@ -26,13 +26,22 @@ public class MathService {
                 throw new EquationException("Equation already exists");
             }
             if (parser.validateParentheses(parts[0]) && parser.validateParentheses(parts[1])) {
-                repository.saveEquation(parser.parseExpr(parts[0]), parser.parseExpr(parts[1]), equation);
+                String leftPart = parser.parseExpr(parts[0]);
+                String rightPart = parser.parseExpr(parts[1]);
+                if (!equation.contains("x") && !validateEquation(leftPart, rightPart)) {
+                    throw new EquationException("Incorrect equation!");
+                }
+                repository.saveEquation(leftPart, rightPart, equation);
             } else {
                 throw new EquationException("Incorrect parentheses!");
             }
         } else {
             throw new EquationException("Incorrect equation!");
         }
+    }
+
+    private boolean validateEquation(String leftPart, String rightPart) {
+        return evaluator.evaluate(leftPart) - evaluator.evaluate(rightPart) == 0;
     }
 
     public boolean saveRoot(int equationId, double root) {
