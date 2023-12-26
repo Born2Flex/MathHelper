@@ -15,7 +15,7 @@ public class MathRepository {
     public MathRepository(String url, String username, String password) {
         try {
             connection = DriverManager.getConnection(url, username, password);
-            log.info("Connection to DB created successfully");
+            log.debug("Connection to DB created successfully");
         } catch (SQLException e) {
             log.warn("Can't create connection to DB");
             throw new RuntimeException("Failed to create connection", e);
@@ -133,5 +133,44 @@ public class MathRepository {
             log.warn("Can't find all equations");
         }
         return equations;
+    }
+
+    public boolean equationAlreadyExists(String equation) {
+        try (PreparedStatement statement = connection
+                .prepareStatement("""
+                                    SELECT COUNT(*)
+                                    FROM equations
+                                    WHERE equation = (?)
+                                    """)) {
+            statement.setString(1, equation);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                int count = resultSet.getInt(1);
+                return count > 0;
+            }
+        } catch (SQLException e) {
+            log.warn("Error checking if equation exists in DB", e);
+        }
+        return false;
+    }
+
+    public boolean rootAlreadyExists(int equationId, double root) {
+        try (PreparedStatement statement = connection
+                .prepareStatement("""
+                                    SELECT COUNT(*)
+                                    FROM roots
+                                    WHERE equation_id = (?) AND root_value = (?)
+                                    """)) {
+            statement.setInt(1, equationId);
+            statement.setDouble(2, root);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                int count = resultSet.getInt(1);
+                return count > 0;
+            }
+        } catch (SQLException e) {
+            log.warn("Error checking if root exists in DB", e);
+        }
+        return false;
     }
 }

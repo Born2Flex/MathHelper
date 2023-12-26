@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.task.calculations.Evaluator;
 import org.task.calculations.Parser;
+import org.task.db.DBInitializer;
 import org.task.dto.EquationDto;
 import org.task.exceptions.EquationException;
 import org.task.exceptions.InvalidPropertiesException;
@@ -61,6 +62,10 @@ public class MathHelperCLI {
         PropertiesLoader propertiesLoader = new PropertiesLoader();
         Properties properties = propertiesLoader.loadProperties();
         validateProperties(properties);
+        DBInitializer initializer = new DBInitializer(properties.getProperty("url"),
+                                                    properties.getProperty("username"),
+                                                    properties.getProperty("password"));
+        initializer.initialize();
         return new MathService(new Parser(),
                 new Evaluator(),
                 new MathRepository(properties.getProperty("url"),
@@ -93,7 +98,6 @@ public class MathHelperCLI {
             log.info("No equations available. Returning to the main menu.");
             return;
         }
-
         log.info("Select an equation by entering its number (or type 'back' to return to the main menu):");
         for (int i = 0; i < equations.size(); i++) {
             log.info("{}. {}", (i + 1), equations.get(i).getEquation());
@@ -108,7 +112,7 @@ public class MathHelperCLI {
         if (result) {
             log.info("Root added successfully.");
         } else {
-            log.warn("Incorrect root");
+            log.warn("Root is incorrect or already exists");
         }
     }
 
@@ -118,7 +122,7 @@ public class MathHelperCLI {
         scanner.nextLine();
         List<String> equations = mathService.findEquationsByRoot(root);
         if (equations.isEmpty()) {
-            log.warn("No equations found with the specified root.");
+            log.info("No equations found with the specified root.");
         } else {
             log.info("Equations with the specified root:");
             for (String equation : equations) {

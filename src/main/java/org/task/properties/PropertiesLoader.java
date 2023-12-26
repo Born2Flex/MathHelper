@@ -2,8 +2,6 @@ package org.task.properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.task.App;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -15,8 +13,7 @@ public class PropertiesLoader {
     public Properties loadProperties() {
         Properties properties = new Properties();
         try {
-            // Use the current class's ClassLoader to access resources
-            ClassLoader classLoader = App.class.getClassLoader();
+            ClassLoader classLoader = PropertiesLoader.class.getClassLoader();
             InputStream input = classLoader.getResourceAsStream(CONFIG_FILENAME);
 
             if (input != null) {

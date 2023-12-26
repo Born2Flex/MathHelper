@@ -18,17 +18,15 @@ public class MathService {
         this.repository = repository;
     }
 
-    public EquationDto findEquationById(int id) {
-        return repository.findEquationById(id);
-    }
-
     public void saveEquation(String equation) {
         if (equation.indexOf('=') != -1) {
             String[] parts = equation.split("=");
+            equation = equation.replaceAll("\\s+", "");
+            if (repository.equationAlreadyExists(equation)) {
+                throw new EquationException("Equation already exists");
+            }
             if (parser.validateParentheses(parts[0]) && parser.validateParentheses(parts[1])) {
-                repository.saveEquation(parser.parseExpr(parts[0]),
-                                        parser.parseExpr(parts[1]),
-                                        equation.replaceAll("\\s+", ""));
+                repository.saveEquation(parser.parseExpr(parts[0]), parser.parseExpr(parts[1]), equation);
             } else {
                 throw new EquationException("Incorrect parentheses!");
             }
@@ -39,7 +37,8 @@ public class MathService {
 
     public boolean saveRoot(int equationId, double root) {
         EquationDto equationDto = repository.findEquationById(equationId);
-        if (evaluator.validateRootForEquation(equationDto.getLeftPart(), equationDto.getRightPart(), root)) {
+        if (evaluator.validateRootForEquation(equationDto.getLeftPart(), equationDto.getRightPart(), root)
+                && !repository.rootAlreadyExists(equationId, root)) {
             repository.saveRoot(equationId, root);
             return true;
         }
